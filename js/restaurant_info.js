@@ -90,6 +90,15 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
+  const picture = document.getElementById('restaurant-picture');
+  picture.className = 'restaurant-img'
+
+  const smallScreen = document.getElementById('small-screen');
+  smallScreen.srcset = DBHelper.imageUrlForRestaurantSmall(restaurant);
+
+  const largeScreen = document.getElementById('large-screen');
+  largeScreen.srcset = DBHelper.imageUrlForRestaurant(restaurant);
+
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
   image.src = DBHelper.imageUrlForRestaurant(restaurant);

@@ -43,7 +43,13 @@
       <div class = "button-container">
         <button class="viewmap-button">View Map</button>
       </div>
-      <img id="restaurant-img">
+
+      <picture id="restaurant-picture">
+        <source id="large-screen" media="(min-width: 501px)">
+        <source id="small-screen" media="(max-width: 500px)">
+        <img id="restaurant-img">
+      </picture>
+
       <p id="restaurant-cuisine"></p>
       <p id="restaurant-address"></p>
       <table id="restaurant-hours"></table>
