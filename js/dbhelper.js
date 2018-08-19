@@ -1,3 +1,6 @@
+/** Alt Message data */
+const altMessagesForImagesArray = ["People gathered round a table at Mission Chinese food", "A whole pizza", "Tables at Kang ho dong baekjeong", "Outside of kat's dalicatessen", "People inside of Roberta's pizza", "People sitting round tables in Hometown BBQ", "Outside of Superiority burger", "Outside of the Dutch", "People inside of Mu Ramen", "Inside of Casa Enrique"];
+
 /**
  * Common database helper functions.
  */
@@ -152,11 +155,14 @@ class DBHelper {
   static imageUrlForRestaurant(restaurant) {
     return (`/img/${restaurant.photograph}`);
   }
-
+ //TODO: Refrain from editing the data
   static imageUrlForRestaurantSmall(restaurant) {
     return (`/img/${restaurant.photographSmall}`);
   }
 
+  static altMessagesForImages(restaurant) {
+    return altMessagesForImagesArray[restaurant.id - 1];
+  }
   /**
    * Map marker for a restaurant.
    */

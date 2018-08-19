@@ -3,6 +3,8 @@ var newMap;
 
 const viewMap = document.querySelector('.viewmap-button');
 const mapContainer = document.querySelector('#map-container');
+const main = document.querySelector('#maincontent');
+const footer = document.querySelector('#footer');
 const close = document.querySelector('.close');
 
 /**
@@ -102,6 +104,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img'
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt = DBHelper.altMessagesForImages(restaurant);
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
@@ -206,14 +209,51 @@ getParameterByName = (name, url) => {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-/* Map sliding in logic */
+/* Slide in Map for smaller screens */
 
-viewMap.addEventListener('click', () => {
-  console.log('clicked');
+viewMap.addEventListener('click', openMap);
+
+function openMap() {
+  const focusedBeforeMapSlideIn = document.activeElement;
+  const focuseableElementsString = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex="0"], [contenteditable]';
+  let focusableElements = mapContainer.querySelectorAll(focuseableElementsString);
+  focusableElements = Array.prototype.slice.call(focusableElements);
+
+  const firstTabStop = focusableElements[0];
+  const lastTabStop = focusableElements[focusableElements.length - 1];
+
   mapContainer.classList.add('open');
-})
 
-close.addEventListener('click', () => {
-  mapContainer.classList.remove('open');
-})
+  firstTabStop.focus();
+
+  function trapTabKey(e) {
+    // Check to see if tab key is pressed
+
+    if(e.keyCode === 9) {
+      //Check if  shift key is pressed down
+      if(e.shiftkey) {
+        if(document.activeElement === firstTabStop) {
+          e.preventDefault();
+          lastTabStop.focus();
+        }
+      }
+      //if tab key is pressed alone
+      else{
+        if(document.activeElement === lastTabStop) {
+          e.preventDefault();
+          firstTabStop.focus();
+        }
+      }
+    }
+  }
+
+  mapContainer.addEventListener('keydown', trapTabKey);
+
+  close.addEventListener('click', () => {
+    mapContainer.classList.remove('open');
+    focusedBeforeMapSlideIn.focus();
+  })
+
+
+}
 

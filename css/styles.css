@@ -355,6 +355,7 @@ nav h1 a {
     transform: translateX(800px);
     width: 100%;
     transition: transform 0.5s ease-in;
+    visibility: hidden;
   }
 
   .close {
@@ -369,6 +370,7 @@ nav h1 a {
 
   .open {
     transform: translateX(0px) !important;
+    visibility: visible !important;
   }
 
 
