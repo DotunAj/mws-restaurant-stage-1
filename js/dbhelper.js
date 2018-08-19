@@ -155,10 +155,6 @@ class DBHelper {
   static imageUrlForRestaurant(restaurant) {
     return (`/img/${restaurant.photograph}`);
   }
- //TODO: Refrain from editing the data
-  static imageUrlForRestaurantSmall(restaurant) {
-    return (`/img/${restaurant.photographSmall}`);
-  }
 
   static altMessagesForImages(restaurant) {
     return altMessagesForImagesArray[restaurant.id - 1];
