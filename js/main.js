@@ -3,6 +3,18 @@ let restaurants,
   cuisines
 var newMap
 var markers = []
+/**
+ * Register Service Worker
+*/
+
+if(navigator.serviceWorker){
+  window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+      .catch((err) => {
+          console.log(err);
+      })
+  })
+}
 
 
 /**
