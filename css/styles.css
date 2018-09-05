@@ -169,7 +169,7 @@ nav h1 a {
   min-width: 100%;
   object-fit: cover;
 }
-#restaurants-list li h1 {
+#restaurants-list li h2 {
   color: #FD2C74;
   font-family: Arial,sans-serif;
   font-size: 18px;
@@ -291,7 +291,7 @@ nav h1 a {
 /* #reviews-container {
   padding: 30px 40px 80px;
 } */
-#reviews-container h2 {
+#reviews-container h3 {
   color: #FD2C74;
   font-size: 24pt;
   font-weight: 300;

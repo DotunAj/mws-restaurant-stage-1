@@ -182,7 +182,7 @@ createRestaurantHTML = (restaurant) => {
   div.className = 'restaurant-details';
   li.append(div);
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   div.append(name);
 
@@ -197,6 +197,8 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
+  more.setAttribute('aria-label', `View Details for ${restaurant.name}`);
+  console.log(restaurant.name)
   div.append(more)
 
   return li
@@ -234,7 +236,6 @@ addMarkersToMap = (restaurants = self.restaurants) => {
 window.addEventListener('load', () => {
   const mapFocusables = document.querySelectorAll('.leaflet-marker-icon, .leaflet-control a');
   map.tabIndex = -1;
-  console.log(mapFocusables);
   mapFocusables.forEach(mapFocusable => {
     mapFocusable.tabIndex = -1;
   })
