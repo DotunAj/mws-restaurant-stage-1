@@ -3,6 +3,7 @@ let restaurants,
   cuisines
 var newMap
 var markers = []
+const map = document.querySelector('#map');
 /**
  * Register Service Worker
 */
@@ -226,6 +227,18 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 } */
+
+/**
+ * Jump Focus for map focusables and go straight to main content
+ */
+window.addEventListener('load', () => {
+  const mapFocusables = document.querySelectorAll('.leaflet-marker-icon, .leaflet-control a');
+  map.tabIndex = -1;
+  console.log(mapFocusables);
+  mapFocusables.forEach(mapFocusable => {
+    mapFocusable.tabIndex = -1;
+  })
+})
 
 
 
