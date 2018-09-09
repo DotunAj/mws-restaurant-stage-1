@@ -96,7 +96,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   picture.className = 'restaurant-img'
 
   const smallScreen = document.getElementById('small-screen');
-  smallScreen.srcset = `${DBHelper.imageUrlForRestaurant(restaurant).slice(0,6)}-500.jpg`;
+  if(restaurant.id > 9) {
+    smallScreen.srcset = `${DBHelper.imageUrlForRestaurant(restaurant).slice(0,7)}-500.jpg`;
+  } else {
+    smallScreen.srcset = `${DBHelper.imageUrlForRestaurant(restaurant).slice(0,6)}-500.jpg`;
+  }
 
   const largeScreen = document.getElementById('large-screen');
   largeScreen.srcset = DBHelper.imageUrlForRestaurant(restaurant);
