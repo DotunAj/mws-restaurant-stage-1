@@ -110,6 +110,10 @@ nav h1 a {
   width: 100%;
   background-color: #ccc;
 }
+
+.close {
+  display: none;
+}
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
   width: calc(100% - 30px);
