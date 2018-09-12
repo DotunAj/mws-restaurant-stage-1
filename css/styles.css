@@ -364,6 +364,7 @@ nav h1 a {
 
   /*TODO: Make close button show on smaller viewport*/
   .close {
+    display: block;
     position: absolute;
     top: 20px;
     right: 20px;
