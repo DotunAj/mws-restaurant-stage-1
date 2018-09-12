@@ -2,16 +2,65 @@ let restaurants, neighborhoods, cuisines;
 var newMap;
 var markers = [];
 const map = document.querySelector('#map');
+
 /**
  * Register Service Worker
+ * Check the service worker object for Update
  */
 
 if (navigator.serviceWorker) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => {
-      console.log(err);
-    });
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then(reg => {
+        if (!navigator.serviceWorker.controller) return;
+
+        if (reg.waiting) {
+          updateSw(reg.waiting);
+          return;
+        }
+
+        if (reg.installing) {
+          trackSwInstalling(reg.installing);
+          return;
+        }
+
+        reg.addEventListener('updatefound', () => {
+          trackSwInstalling(reg.installing);
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   });
+}
+
+/**
+ * Reload page if the service worker controlling the page changes
+ */
+let refreshing = false;
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+  if (refreshing) return;
+  window.location.reload();
+  refreshing = true;
+});
+
+/**
+ * Track the installing state of the service worker
+ */
+function trackSwInstalling(worker) {
+  worker.addEventListener('statechange', () => {
+    if (worker.state === 'installed') {
+      updateSw(worker);
+    }
+  });
+}
+
+/**
+ * Update the post message in the worke that trigers a reload
+ */
+function updateSw(worker) {
+  worker.postMessage({ action: 'skipWaiting' });
 }
 
 /**
