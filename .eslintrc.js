@@ -3,7 +3,10 @@ module.exports = {
         "browser": true,
         "es6": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "prettier"
+    ],
     "parserOptions": {
         "ecmaVersion": 2016
     },
@@ -23,6 +26,17 @@ module.exports = {
         "semi": [
             "error",
             "always"
+        ],
+        "prettier/prettier": [
+            "error",
+            {
+                "trailingComma": "es5",
+                "singleQuote": true,
+                "printWidth": 120
+            }
         ]
-    }
+    },
+    "plugins": [
+        "prettier"
+    ]
 };

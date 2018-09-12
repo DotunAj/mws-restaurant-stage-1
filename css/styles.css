@@ -362,6 +362,7 @@ nav h1 a {
     visibility: hidden;
   }
 
+  /*TODO: Make close button show on smaller viewport*/
   .close {
     position: absolute;
     top: 20px;
