@@ -7,11 +7,11 @@ self.addEventListener('install', event => {
         './',
         './restaurant',
         './css/styles.css',
-        './data/restaurants.json',
         './js/dbhelper.js',
         './js/restaurant_info.js',
         './js/main.js',
         './img',
+        'https://rawgit.com/jakearchibald/idb/master/lib/idb.js',
       ]);
     })
   );

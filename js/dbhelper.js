@@ -11,6 +11,12 @@ const altMessagesForImagesArray = [
   'People inside of Mu Ramen',
   'Inside of Casa Enrique',
 ];
+/**
+ * IDb initialization
+ */
+const dbPromise = idb.open('restaurant', 1, upgradeDb => {
+  const keyVal = upgradeDb.createObjectStore('restaurant-data', { keyPath: 'id' });
+});
 
 /**
  * Common database helper functions.
@@ -34,9 +40,28 @@ class DBHelper {
       .then(data => {
         const restaurants = data;
         callback(null, restaurants);
+        dbPromise.then(db => {
+          if (!db) return;
+          const tx = db.transaction('restaurant-data', 'readwrite');
+          const store = tx.objectStore('restaurant-data');
+          restaurants.forEach(restaurant => {
+            store.put(restaurant);
+          });
+        });
       })
       .catch(error => {
-        callback(error, null);
+        dbPromise.then(db => {
+          if (!db) return;
+          const tx = db.transaction('restaurant-data');
+          const store = tx.objectStore('restaurant-data');
+          store.getAll().then(restaurants => {
+            if (restaurants.length === 0) {
+              callback(error, null);
+              return;
+            }
+            callback(null, restaurants);
+          });
+        });
       });
   }
 
