@@ -191,7 +191,6 @@ class DBHelper {
     if (restaurant.photograph) {
       return `/img/${restaurant.photograph}.jpg`;
     } else {
-      console.log(`/img/${restaurant.id}.jpg`);
       return `/img/${restaurant.id}.jpg`;
     }
   }
