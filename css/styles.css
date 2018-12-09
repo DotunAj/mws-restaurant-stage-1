@@ -328,9 +328,30 @@ nav h1 a {
   color: #00000091;
 }
 
+#reviews-form textarea, input[type="text"], input[type="range"] {
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 10px;
+  width: calc(100% - 20px);
+  border: 1px solid #eaeaea;
+  margin: 0 0 30px;
+  background-color: #f8f8f8;
+}
+#reviews-form input[type="submit"]{
+  background-color: #FD2C74;
+  color: #fff;
+  padding: 10px 20px;
+  border: 0px;
+  border-radius: 3px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+
 #restaurant-hours td {
   color: #666;
 }
+
 
 /*Map style edit*/
 .leaflet-container a{

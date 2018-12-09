@@ -1,9 +1,32 @@
 var newMap;
+var reviews_all;
 
 const viewMap = document.querySelector('.viewmap-button');
 const mapContainer = document.querySelector('#map-container');
 const close = document.querySelector('.close');
 
+/**
+ * Get a parameter by name from page URL.
+ */
+const getParameterByName = (name, url) => {
+  if (!url) url = window.location.href;
+  name = name.replace(/[[\]]/g, '\\$&');
+  const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
+    results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+};
+
+const id = getParameterByName('id');
+/**
+ * Review DbHElper
+ */
+fetch(`http://localhost:1337/reviews/?restaurant_id=${id}`)
+  .then(response => response.json())
+  .then(data => {
+    reviews_all = data;
+  });
 /**
  * Initialize map as soon as the page is loaded.
  */
@@ -65,7 +88,6 @@ const fetchRestaurantFromURL = callback => {
     callback(null, self.restaurant);
     return;
   }
-  const id = getParameterByName('id');
   if (!id) {
     // no id found in URL
     error = 'No restaurant id in URL';
@@ -120,6 +142,12 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   }
   // fill reviews
   fillReviewsHTML();
+
+  /**
+ * Add restaurant id to from parameters
+ */
+
+  document.querySelector('#restaurant_id').value = restaurant.id;
 };
 
 /**
@@ -145,7 +173,7 @@ const fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hour
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (reviews = reviews_all) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -173,10 +201,6 @@ const createReviewHTML = review => {
   name.innerHTML = review.name;
   li.appendChild(name);
 
-  const date = document.createElement('p');
-  date.innerHTML = review.date;
-  li.appendChild(date);
-
   const rating = document.createElement('p');
   rating.innerHTML = `Rating: ${review.rating}`;
   li.appendChild(rating);
@@ -198,18 +222,6 @@ const fillBreadcrumb = (restaurant = self.restaurant) => {
   breadcrumb.appendChild(li);
 };
 
-/**
- * Get a parameter by name from page URL.
- */
-const getParameterByName = (name, url) => {
-  if (!url) url = window.location.href;
-  name = name.replace(/[[\]]/g, '\\$&');
-  const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
-    results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return '';
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
-};
 
 /* Slide in Map for smaller screens */
 
@@ -257,3 +269,5 @@ function openMap() {
     focusedBeforeMapSlideIn.focus();
   });
 }
+
+
