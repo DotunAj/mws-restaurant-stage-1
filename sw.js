@@ -1,4 +1,4 @@
-const currentCacheName = 'restaurant-static-3';
+const currentCacheName = 'restaurant-static-4';
 
 self.addEventListener('install', event => {
   event.waitUntil(

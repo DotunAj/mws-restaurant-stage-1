@@ -46,7 +46,12 @@ fetch(`http://localhost:1337/reviews/?restaurant_id=${id}`)
           console.log(error);
           return;
         }
-        reviews_all = reviews;
+        const reviewss = reviews.filter(review => {
+          if(review.restaurant_id == getParameterByName('id')){
+            return true;
+          }
+        })
+        reviews_all = reviewss;
       });
     });
   });
