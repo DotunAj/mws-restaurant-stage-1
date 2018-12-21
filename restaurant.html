@@ -6,6 +6,8 @@
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
   <link rel="stylesheet" href="css/styles.css" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP"
+    crossorigin="anonymous">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
     crossorigin="" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,7 +43,10 @@
     <!-- End map -->
     <!-- Beginning restaurant -->
     <section id="restaurant-container">
-      <h2 id="restaurant-name"></h2>
+      <div class="restaurant-name-favorite">
+        <h2 id="restaurant-name"></h2>
+        <button class="restaurant-favorite-button"></button>
+      </div>
       <div class="button-container">
         <button class="viewmap-button">View Map</button>
       </div>
@@ -62,25 +67,27 @@
       <ul id="reviews-list"></ul>
       <div>
         <h2 id="review-header">Add a Review to our Restaurant</h2>
-        <form target="_blank" id="reviews-form" action="http://localhost:1337/reviews/" method="post">
+        <form id="reviews-form">
 
           <input id="restaurant_id" name="restaurant_id" type="hidden" value="xm234jq">
           <div>
-          <label for="comments">Comment</label>
+            <label for="comments">Comment</label>
             <textarea id="comments" name="comments" cols="45" rows="8" maxlength="65525" required="required"></textarea>
           </div>
 
           <div>
             <label for="name">Name</label>
             <input type="text" id="name" name="name" required="required">
-          <div>
+            <div>
 
-          <div>
-            <label for="rating">Rating</label>
-            <input type="range" name="rating" min="1" max="5" step="1">
-          </div>
+              <div>
+                <label for="rating">Rating</label>
+                <div id="rating-slider">
+                  1<input type="range" name="rating" min="1" max="5" step="1">5
+                </div>
+              </div>
 
-          <input onclick="window.location.reload();" name="submit" type="submit" id="submit" class="submit" value="Post Review">
+              <input name="submit" type="submit" id="submit" class="submit" value="Post Review">
         </form>
       </div>
     </section>

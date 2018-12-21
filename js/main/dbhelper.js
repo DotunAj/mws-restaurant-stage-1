@@ -15,7 +15,8 @@ const altMessagesForImagesArray = [
  * IDb initialization
  */
 const dbPromise = idb.open('restaurant', 1, upgradeDb => {
-  const keyVal = upgradeDb.createObjectStore('restaurant-data', { keyPath: 'id' });
+  const restaurant = upgradeDb.createObjectStore('restaurant-data', { keyPath: 'id' });
+  const review = upgradeDb.createObjectStore('review-data', { keyPath: 'id' });
 });
 
 /**

@@ -1,5 +1,6 @@
 var newMap;
 const map = document.querySelector('#map');
+let allFavoriteButtons;
 
 /**
  * Register Service Worker
@@ -210,6 +211,7 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
+  allFavoriteButtons = document.querySelectorAll('.restaurant-favorite-button');
   addMarkersToMap();
 };
 
@@ -233,9 +235,23 @@ const createRestaurantHTML = restaurant => {
   div.className = 'restaurant-details';
   li.append(div);
 
+  const div2 = document.createElement('div');
+  div2.className = 'restaurant-name-favorite';
+  div.append(div2);
+
   const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
-  div.append(name);
+  div2.append(name);
+
+  const i = document.createElement('i');
+  i.className = 'fas fa-heart';
+  if (restaurant.is_favorite === 'true') {
+    i.classList.add('restaurant-favorite-clicked');
+  } else {
+    i.classList.remove('restaurant-favorite-clicked');
+  }
+  div2.setAttribute('aria-label', `${restaurant.name} is favorite restaurant`);
+  div2.append(i);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;

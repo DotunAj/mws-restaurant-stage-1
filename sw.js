@@ -1,4 +1,4 @@
-const currentCacheName = 'restaurant-static-2';
+const currentCacheName = 'restaurant-static-3';
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -11,6 +11,7 @@ self.addEventListener('install', event => {
         './js/restaurant.js',
         './img',
         'https://rawgit.com/jakearchibald/idb/master/lib/idb.js',
+        'https://use.fontawesome.com/releases/v5.6.1/css/all.css'
       ]);
     })
   );

@@ -1,5 +1,6 @@
 var newMap;
 var reviews_all;
+var favoriteFlag = false;
 
 const viewMap = document.querySelector('.viewmap-button');
 const mapContainer = document.querySelector('#map-container');
@@ -26,7 +27,30 @@ fetch(`http://localhost:1337/reviews/?restaurant_id=${id}`)
   .then(response => response.json())
   .then(data => {
     reviews_all = data;
+    dbPromise.then(db => {
+      if (!db) return;
+      const tx = db.transaction('review-data', 'readwrite');
+      const store = tx.objectStore('review-data');
+      reviews_all.forEach(review => {
+        store.put(review);
+      });
+    });
+  })
+  .catch(error => {
+    dbPromise.then(db => {
+      if (!db) return;
+      const tx = db.transaction('review-data');
+      const store = tx.objectStore('review-data');
+      store.getAll().then(reviews => {
+        if (reviews.length === 0) {
+          console.log(error);
+          return;
+        }
+        reviews_all = reviews;
+      });
+    });
   });
+
 /**
  * Initialize map as soon as the page is loaded.
  */
@@ -112,6 +136,19 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
+  const button = document.querySelector('.restaurant-favorite-button');
+
+  const i = document.createElement('i');
+  if (restaurant.is_favorite === 'true') {
+    favoriteFlag = true;
+    i.className = 'fas fa-heart restaurant-favorite-clicked';
+  } else {
+    favoriteFlag = false;
+    i.className = 'fas fa-heart';
+  }
+  button.setAttribute('aria-label', `${restaurant.name} is favorite restaurant`);
+  button.append(i);
+
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
@@ -144,8 +181,8 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
   fillReviewsHTML();
 
   /**
- * Add restaurant id to from parameters
- */
+   * Add restaurant id to from parameters
+   */
 
   document.querySelector('#restaurant_id').value = restaurant.id;
 };
@@ -186,7 +223,7 @@ const fillReviewsHTML = (reviews = reviews_all) => {
     return;
   }
   const ul = document.getElementById('reviews-list');
-  reviews.forEach(review => {
+  reviews.reverse().forEach(review => {
     ul.appendChild(createReviewHTML(review));
   });
   container.appendChild(ul);
@@ -221,7 +258,6 @@ const fillBreadcrumb = (restaurant = self.restaurant) => {
   li.innerHTML = restaurant.name;
   breadcrumb.appendChild(li);
 };
-
 
 /* Slide in Map for smaller screens */
 
@@ -270,4 +306,49 @@ function openMap() {
   });
 }
 
+/**
+ * Handler for review form
+ */
+function processForm(e) {
+  if (e.preventDefault) e.preventDefault();
+  const data = new URLSearchParams();
+  for (const pair of new FormData(e.target)) {
+    data.append(pair[0], pair[1]);
+  }
+  fetch('http://localhost:1337/reviews/', {
+    method: 'post',
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
+    body: data,
+  });
+  window.location.reload();
+  return false;
+}
 
+/**
+ * Handle the Button that makes a restaurant favorite
+ */
+
+function handlefavorite() {
+  const id = getParameterByName('id');
+  fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=${!favoriteFlag}`, {
+    method: 'put',
+    data: `is_favorite=${!favoriteFlag}`,
+  }).then(() => {
+    favoriteFlag = !favoriteFlag;
+    const i = document.querySelector('.fa-heart');
+    i.classList.toggle('restaurant-favorite-clicked');
+  });
+}
+
+window.onload = function() {
+  const form = document.querySelector('#reviews-form');
+  if (form.attachEvent) {
+    form.attachEvent('submit', processForm);
+  } else {
+    form.addEventListener('submit', processForm);
+  }
+  const favoriteButton = document.querySelector('.restaurant-favorite-button');
+  favoriteButton.addEventListener('click', handlefavorite);
+};
