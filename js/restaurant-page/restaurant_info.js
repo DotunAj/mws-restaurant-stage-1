@@ -47,10 +47,10 @@ fetch(`http://localhost:1337/reviews/?restaurant_id=${id}`)
           return;
         }
         const reviewss = reviews.filter(review => {
-          if(review.restaurant_id == getParameterByName('id')){
+          if (review.restaurant_id == getParameterByName('id')) {
             return true;
           }
-        })
+        });
         reviews_all = reviewss;
       });
     });
@@ -337,14 +337,23 @@ function processForm(e) {
 
 function handlefavorite() {
   const id = getParameterByName('id');
-  fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=${!favoriteFlag}`, {
-    method: 'put',
-    data: `is_favorite=${!favoriteFlag}`,
-  }).then(() => {
-    favoriteFlag = !favoriteFlag;
-    const i = document.querySelector('.fa-heart');
-    i.classList.toggle('restaurant-favorite-clicked');
-  });
+  if (navigator.onLine) {
+    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=${!favoriteFlag}`, {
+      method: 'put',
+      data: `is_favorite=${!favoriteFlag}`,
+    }).then(() => {
+      favoriteFlag = !favoriteFlag;
+      const i = document.querySelector('.fa-heart');
+      i.classList.toggle('restaurant-favorite-clicked');
+    });
+  } else {
+    dbPromise.then(db => {
+      if (!db) return;
+      const tx = db.transaction('favorite-data', 'readwrite');
+      const store = tx.objectStore('favorite-data');
+      store.put(`is_favorite=${!favoriteFlag}`, `${id}`);
+    });
+  }
 }
 
 window.onload = function() {
@@ -354,6 +363,22 @@ window.onload = function() {
   } else {
     form.addEventListener('submit', processForm);
   }
+  window.addEventListener('online', () => {
+    dbPromise
+      .then(db => {
+        if (!db) return;
+        const tx = db.transaction('favorite-data');
+        const store = tx.objectStore('favorite-data');
+        return store.openCursor();
+      })
+      .then(function putFavorite(cursor) {
+        fetch(`http://localhost:1337/restaurants/${cursor.key}/?is_favorite=${cursor.value}`, {
+          method: 'put',
+          data: `is_favorite=${cursor.value}`,
+        });
+        cursor.continue(putFavorite);
+      });
+  });
   const favoriteButton = document.querySelector('.restaurant-favorite-button');
   favoriteButton.addEventListener('click', handlefavorite);
 };
