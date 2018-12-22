@@ -351,7 +351,10 @@ function handlefavorite() {
       if (!db) return;
       const tx = db.transaction('favorite-data', 'readwrite');
       const store = tx.objectStore('favorite-data');
-      store.put(`is_favorite=${!favoriteFlag}`, `${id}`);
+      store.put(`${!favoriteFlag}`, `${id}`);
+      favoriteFlag = !favoriteFlag;
+      const i = document.querySelector('.fa-heart');
+      i.classList.toggle('restaurant-favorite-clicked');
     });
   }
 }
@@ -367,7 +370,7 @@ window.onload = function() {
     dbPromise
       .then(db => {
         if (!db) return;
-        const tx = db.transaction('favorite-data');
+        const tx = db.transaction('favorite-data', 'readwrite');
         const store = tx.objectStore('favorite-data');
         return store.openCursor();
       })
@@ -376,6 +379,7 @@ window.onload = function() {
           method: 'put',
           data: `is_favorite=${cursor.value}`,
         });
+        cursor.delete();
         cursor.continue(putFavorite);
       });
   });
