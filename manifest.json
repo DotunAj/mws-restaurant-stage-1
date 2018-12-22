@@ -1,6 +1,6 @@
 {
  "name": "Restaurant Review",
- "short_name": "Restaurant Reviews",
+ "short_name": "Reviews",
  "start_url": "./",
  "display": "standalone",
  "background_color": "#F3F3F3",
