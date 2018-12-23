@@ -26,7 +26,6 @@ const id = getParameterByName('id');
 fetch(`http://localhost:1337/reviews/?restaurant_id=${id}`)
   .then(response => response.json())
   .then(data => {
-    reviews_all = data;
     dbPromise.then(db => {
       if (!db) return;
       const tx = db.transaction('review-data', 'readwrite');
@@ -35,6 +34,7 @@ fetch(`http://localhost:1337/reviews/?restaurant_id=${id}`)
         store.put(review);
       });
     });
+    reviews_all = data;
   })
   .catch(error => {
     dbPromise.then(db => {
@@ -320,15 +320,34 @@ function processForm(e) {
   for (const pair of new FormData(e.target)) {
     data.append(pair[0], pair[1]);
   }
-  fetch('http://localhost:1337/reviews/', {
-    method: 'post',
-    headers: {
-      'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    },
-    body: data,
-  });
-  window.location.reload();
-  return false;
+
+  if (navigator.onLine) {
+    fetch('http://localhost:1337/reviews/', {
+      method: 'post',
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+      body: data,
+    }).then(() => {
+      window.location.reload();
+      return false;
+    });
+  } else {
+    const dbData = {
+      data: data,
+      id: Math.random().toString(36).substr(2),
+    };
+    console.log(dbData);
+    dbPromise.then(db => {
+      if (!db) return;
+      const tx = db.transaction('offlineReview-data', 'readwrite');
+      const store = tx.objectStore('offlineReview-data');
+      store.put(dbData);
+      window.location.reload();
+      return false;
+    })
+  }
+  
 }
 
 /**
@@ -381,6 +400,24 @@ window.onload = function() {
         });
         cursor.delete();
         cursor.continue(putFavorite);
+      });
+    dbPromise
+      .then(db => {
+        if (!db) return;
+        const tx = db.transaction('offlineReview-data');
+        const store = tx.objectStore('offlineReview-data');
+        return store.openCursor();
+      })
+      .then(function putReview(cursor) {
+        fetch('http://localhost:1337/reviews/', {
+          method: 'post',
+          headers: {
+            'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          },
+          body: cursor.data,
+        });
+        cursor.delete();
+        cursor.continue(putReview);
       });
   });
   const favoriteButton = document.querySelector('.restaurant-favorite-button');
