@@ -314,12 +314,21 @@ function openMap() {
 /**
  * Handler for review form
  */
+function generateId() {
+  return Math.random().toString(36).substr(2);
+}
 function processForm(e) {
+  let presentId = generateId();
   if (e.preventDefault) e.preventDefault();
   const data = new URLSearchParams();
-  for (const pair of new FormData(e.target)) {
+  const data2 = new FormData(e.target);
+  for (const pair of data2) {
     data.append(pair[0], pair[1]);
   }
+  var formObject = {};
+  data2.forEach(function(value, key) {
+    formObject[key] = value;
+  });
 
   if (navigator.onLine) {
     fetch('http://localhost:1337/reviews/', {
@@ -333,21 +342,27 @@ function processForm(e) {
       return false;
     });
   } else {
-    const dbData = {
-      data: data,
-      id: Math.random().toString(36).substr(2),
-    };
-    console.log(dbData);
-    dbPromise.then(db => {
-      if (!db) return;
-      const tx = db.transaction('offlineReview-data', 'readwrite');
-      const store = tx.objectStore('offlineReview-data');
-      store.put(dbData);
-      window.location.reload();
-      return false;
-    })
+    const dbData = formObject;
+    dbPromise
+      .then(db => {
+        if (!db) return;
+        const tx = db.transaction('offlineReview-data', 'readwrite');
+        const store = tx.objectStore('offlineReview-data');
+        store.put(formObject, presentId);
+      })
+      .then(() => {
+        dbPromise.then(db2 => {
+          dbData['id'] = presentId;
+          console.log(dbData);
+          const tx1 = db2.transaction('review-data', 'readwrite');
+          const store1 = tx1.objectStore('review-data');
+          store1.put(dbData);
+          window.location.reload();
+          return false;
+        });
+      });
   }
-  
+
 }
 
 /**
@@ -386,38 +401,65 @@ window.onload = function() {
     form.addEventListener('submit', processForm);
   }
   window.addEventListener('online', () => {
+    let presentId;
     dbPromise
       .then(db => {
         if (!db) return;
         const tx = db.transaction('favorite-data', 'readwrite');
         const store = tx.objectStore('favorite-data');
+        store.getAll().then(favorites => {
+          if (favorites.length === 0) {
+            return;
+          }
+        });
         return store.openCursor();
       })
       .then(function putFavorite(cursor) {
+        if (!cursor) return;
         fetch(`http://localhost:1337/restaurants/${cursor.key}/?is_favorite=${cursor.value}`, {
           method: 'put',
           data: `is_favorite=${cursor.value}`,
         });
         cursor.delete();
-        cursor.continue(putFavorite);
+        return cursor.continue().then(putFavorite);
       });
     dbPromise
       .then(db => {
         if (!db) return;
-        const tx = db.transaction('offlineReview-data');
+        const tx = db.transaction('offlineReview-data', 'readwrite');
         const store = tx.objectStore('offlineReview-data');
         return store.openCursor();
       })
       .then(function putReview(cursor) {
+        if (!cursor) return;
+        presentId = cursor.key;
+        const data = new URLSearchParams();
+        for (const key of Object.keys(cursor.value)) {
+          data.append(key, cursor.value[key]);
+        }
         fetch('http://localhost:1337/reviews/', {
           method: 'post',
           headers: {
             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
           },
-          body: cursor.data,
+          body: data,
+        }).then(() => {
+          dbPromise
+            .then(db => {
+              const tx = db.transaction('review-data', 'readwrite');
+              const store = tx.objectStore('review-data');
+              return store.openCursor();
+            })
+            .then(function deleteReview(cursor) {
+              if (!cursor) return;
+              if (cursor.key === presentId) {
+                cursor.delete();
+              }
+              cursor.continue().then(deleteReview);
+            });
         });
         cursor.delete();
-        cursor.continue(putReview);
+        return cursor.continue().then(putReview);
       });
   });
   const favoriteButton = document.querySelector('.restaurant-favorite-button');
